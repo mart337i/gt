@@ -3,7 +3,7 @@
 # SOURCE: https://github.com/iridakos/goto
 # MIT License
 #
-# Copyright (c) 2018 Lazarus Lazaridis
+# Copyright (c) 2025 Martin Egeskov
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -230,7 +230,8 @@ _gt_unregister_alias()
   fi
 
   # shellcheck disable=SC2034
-  local readonly GT_DB_TMP="$HOME/.gt_"
+  local GT_DB_TMP="$HOME/.gt_"
+  readonly GT_DB_TMP
   # Delete entry from file.
   sed "/^$1 /d" "$GT_DB" > "$GT_DB_TMP" && mv "$GT_DB_TMP" "$GT_DB"
   echo "Alias '$1' unregistered successfully."
@@ -383,7 +384,7 @@ _complete_gt_aliases()
       compopt +o filenames 2>/dev/null
 
       if ! [[ $(uname -s) =~ Darwin* ]]; then
-        matches[$i]=$(printf '%*s' "-$COLUMNS" "${matches[$i]}")
+        matches[i]=$(printf '%*s' "-$COLUMNS" "${matches[i]}")
 
         COMPREPLY+=("$(compgen -W "${matches[$i]}")")
       else
@@ -415,10 +416,9 @@ _complete_gt_bash()
           local IFS=$'\n'
           local subdirs
           # Get subdirectories, preserving the alias/ prefix and adding trailing slash
-          subdirs=$(cd "$alias_dir" 2>/dev/null && compgen -d -- "$subpath" | while read -r dir; do echo "$alias_name/$dir/"; done)
-          
+          # shellcheck disable=SC2207
+          COMPREPLY=($(cd "$alias_dir" 2>/dev/null && compgen -d -- "$subpath" | while read -r dir; do echo "$alias_name/$dir/"; done))
           compopt -o nospace 2>/dev/null
-          COMPREPLY=($subdirs)
         fi
       else
         # and doesn't start as a command, prompt aliases
@@ -446,6 +446,7 @@ _complete_gt_bash()
         local IFS=$' \t\n'
         compopt -o nospace 2>/dev/null
         # Add trailing slash to directories for easy continuation
+        # shellcheck disable=SC2207
         COMPREPLY=($(cd "$alias_dir" 2>/dev/null && compgen -d -- "$cur" | while read -r dir; do echo "$dir/"; done))
       fi
     fi
@@ -470,7 +471,7 @@ _complete_gt_zsh()
   _gt_resolve_db
   while IFS= read -r line; do
     all_aliases+=("$line")
-  done <<< "$(sed -e 's/ /:/g' $GT_DB 2>/dev/null)"
+  done <<< "$(sed -e 's/ /:/g' "$GT_DB" 2>/dev/null)"
 
   local state
   local -a options=(
@@ -499,9 +500,10 @@ _complete_gt_zsh()
       _describe -t aliases 'unregister alias:' all_aliases && ret=0
     ;;
   esac
-  return $ret
+  return "$ret"
 }
 
+# shellcheck disable=SC2207
 gt_aliases=($(alias | sed -n "s/.*\s\(.*\)='gt'/\1/p"))
 gt_aliases+=("gt")
 
@@ -510,12 +512,12 @@ for i in "${gt_aliases[@]}"
 		# Register the gt completions.
 	if [ -n "${BASH_VERSION}" ]; then
 	  if ! [[ $(uname -s) =~ Darwin* ]]; then
-	    complete -o filenames -F _complete_gt_bash $i
+	    complete -o filenames -F _complete_gt_bash "$i"
 	  else
-	    complete -F _complete_gt_bash $i
+	    complete -F _complete_gt_bash "$i"
 	  fi
 	elif [ -n "${ZSH_VERSION}" ]; then
-	  compdef _complete_gt_zsh $i
+	  compdef _complete_gt_zsh "$i"
 	else
 	  echo "Unsupported shell."
 	  exit 1
