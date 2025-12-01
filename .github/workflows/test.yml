@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -19,10 +19,12 @@ jobs:
       uses: actions/checkout@v3
     
     - name: Set up shell
+      env:
+        SHELL_NAME: ${{ matrix.shell }}
       run: |
-        echo "Testing with ${{ matrix.shell }}"
-        ${{ matrix.shell }} --version
-    
+        echo "Testing with $SHELL_NAME"
+        $SHELL_NAME --version
+
     - name: Make test scripts executable
       run: chmod +x tests/run_tests.sh tests/test_scenarios.sh
     
