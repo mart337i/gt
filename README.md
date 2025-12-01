@@ -22,7 +22,7 @@ Tab completion shows all your aliases and their paths.
 
 ### Via install script
 ```bash
-git clone https://github.com/YOUR_USERNAME/gt.git
+git clone https://github.com/mart337i/gt.git
 cd gt
 sudo ./install
 ```
