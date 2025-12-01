@@ -29,7 +29,6 @@ jobs:
       run: chmod +x tests/run_tests.sh tests/test_scenarios.sh
     
     - name: Run tests
-      shell: ${{ matrix.shell }} {0}
       run: ./tests/run_tests.sh
     
     - name: Test summary
