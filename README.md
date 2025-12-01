@@ -108,6 +108,26 @@ To use a custom location:
 export GT_DB="/path/to/your/alias/file"
 ```
 
+## Testing
+
+Run the test suite to verify everything works:
+
+```bash
+./tests/run_tests.sh
+```
+
+All 15 tests should pass:
+- Version and help commands
+- Register/unregister/list aliases
+- Navigation (both slash and space notation)
+- Tab completion
+- Push/pop directory stack
+- Cleanup invalid aliases
+- Deep path navigation
+- Real-world workflows
+
+Tests run automatically on every push via GitHub Actions.
+
 ## Troubleshooting
 
 **zsh: command not found: compdef**
